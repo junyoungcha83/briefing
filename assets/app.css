@@ -1,0 +1,121 @@
+:root {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --header: #0f172a;
+  --re: #dc2626;        /* 부동산 = 빨강 */
+  --ec: #2563eb;        /* 경제 = 파랑 */
+  --link: #2563eb;
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 헤더 */
+.app-header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 14px 16px calc(14px + env(safe-area-inset-top));
+  padding-top: max(14px, env(safe-area-inset-top));
+  background: var(--header); color: #fff;
+}
+.app-header h1 { font-size: 1.2rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+.updated { font-size: .72rem; color: #94a3b8; }
+
+/* 필터 칩 */
+.filters {
+  position: sticky; top: 0; z-index: 9;
+  display: flex; gap: 8px; padding: 10px 16px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 999px; padding: 6px 14px; font-size: .85rem; cursor: pointer;
+  white-space: nowrap;
+}
+.chip.active { background: var(--header); color: #fff; border-color: var(--header); }
+.chip.active .flag { box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
+
+/* 깃발 — CSS 로 그린 작은 깃발(파란 깃발 이모지가 없어 CSS 사용) */
+.flag {
+  position: relative; display: inline-block;
+  width: 13px; height: 15px; flex: 0 0 auto;
+}
+.flag::before {  /* 깃대 */
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; border-radius: 1px; background: #94a3b8;
+}
+.flag::after {   /* 깃폭 */
+  content: ""; position: absolute; left: 2px; top: 1px;
+  width: 10px; height: 8px; border-radius: 1px;
+}
+.flag.realestate::after { background: var(--re); }
+.flag.economy::after    { background: var(--ec); }
+
+/* 피드 */
+.feed {
+  max-width: 720px; margin: 0 auto;
+  padding: 12px 12px calc(28px + var(--safe-bottom));
+}
+.loading, .empty {
+  text-align: center; color: var(--muted); padding: 40px 16px; font-size: .9rem;
+}
+
+.date-header {
+  font-size: .8rem; color: var(--muted); font-weight: 600;
+  margin: 18px 4px 8px;
+}
+.date-header:first-child { margin-top: 4px; }
+
+/* 카드 */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+}
+.card.realestate { border-left-color: var(--re); }
+.card.economy    { border-left-color: var(--ec); }
+
+.card-head {
+  display: flex; align-items: flex-start; gap: 8px;
+  width: 100%; text-align: left; background: none; border: none; padding: 0;
+  cursor: pointer; color: var(--text);
+}
+.card-head .flag { margin-top: 3px; }
+.headline {
+  font-size: 1rem; font-weight: 700; line-height: 1.4; letter-spacing: -0.01em;
+}
+
+.preview {
+  margin-top: 7px; color: #374151; font-size: .9rem;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.full { margin-top: 10px; }
+.full .body {
+  font-size: .92rem; color: #1f2937; line-height: 1.65;
+  white-space: normal; word-break: break-word;
+}
+.full .meta {
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  font-size: .8rem;
+}
+.full .src { color: var(--muted); }
+.origin { color: var(--link); text-decoration: none; font-weight: 600; }
+.origin:active { opacity: .6; }
+
+.card.open .headline { color: #111827; }

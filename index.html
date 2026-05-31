@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>브리핑</title>
+<link rel="stylesheet" href="assets/app.css" />
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#0f172a" />
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
+
+<!-- iOS 홈 화면 추가 -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="브리핑" />
+<link rel="apple-touch-icon" href="assets/icon.svg" />
+</head>
+<body>
+
+<header class="app-header">
+  <h1>브리핑</h1>
+  <span class="updated" id="updated"></span>
+</header>
+
+<nav class="filters" id="filters" role="tablist" aria-label="분류">
+  <button class="chip active" data-cat="all" role="tab" aria-selected="true">전체</button>
+  <button class="chip" data-cat="realestate" role="tab" aria-selected="false"><span class="flag realestate"></span>부동산</button>
+  <button class="chip" data-cat="economy" role="tab" aria-selected="false"><span class="flag economy"></span>경제</button>
+</nav>
+
+<main class="feed" id="feed">
+  <div class="loading" id="loading">불러오는 중…</div>
+</main>
+
+<script src="assets/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>
