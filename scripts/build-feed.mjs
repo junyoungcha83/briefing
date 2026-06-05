@@ -3,13 +3,12 @@
 //   node scripts/build-feed.mjs data/_today.json
 // _today.json 형식: { "date": "YYYY-MM-DD", "items": [ {category,headline,preview,body,source,source_url,lang_original}, ... ] }
 //
-// 동작: 오늘 items 를 최신순 prepend → source_url(없으면 id) 기준 중복 제거 → 30일 초과분 트림
+// 동작: 오늘 items 를 최신순 prepend → source_url(없으면 id) 기준 중복 제거 → 전체 영구 보존
 //       → data/feed.json 저장 + data/archive/<date>.json 기록. updated_at 갱신.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-const KEEP_DAYS = 30;
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const FEED = path.join(ROOT, 'data', 'feed.json');
 const ARCHIVE_DIR = path.join(ROOT, 'data', 'archive');
@@ -56,16 +55,11 @@ for (const it of [...norm, ...prev]) {
   merged.push(it);
 }
 
-// 30일 트림
-const cutoff = new Date(date + 'T00:00:00');
-cutoff.setDate(cutoff.getDate() - (KEEP_DAYS - 1));
-const cutoffStr = cutoff.toISOString().slice(0, 10);
-const kept = merged.filter(it => it.date >= cutoffStr);
-
+// 트림 없음 — 전체 항목 영구 보존
 const out = {
   version: 1,
   updated_at: new Date().toISOString(),
-  items: kept,
+  items: merged,
 };
 fs.writeFileSync(FEED, JSON.stringify(out, null, 2) + '\n');
 
@@ -74,4 +68,4 @@ fs.writeFileSync(path.join(ARCHIVE_DIR, `${date}.json`), JSON.stringify({ date, 
 
 const re = norm.filter(i => i.category === 'realestate').length;
 const ec = norm.filter(i => i.category === 'economy').length;
-console.log(`병합 완료: ${date} 신규 ${norm.length}건(부동산 ${re}·경제 ${ec}) → feed 총 ${kept.length}건`);
+console.log(`병합 완료: ${date} 신규 ${norm.length}건(부동산 ${re}·경제 ${ec}) → feed 총 ${merged.length}건`);

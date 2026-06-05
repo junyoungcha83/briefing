@@ -25,9 +25,9 @@ briefing/
 ├── manifest.webmanifest
 ├── sw.js
 ├── data/
-│   ├── feed.json            # 앱이 읽는 최근 ~30일 (생성기가 갱신)
+│   ├── feed.json            # 앱이 읽는 전체 누적 항목 (영구 보존, 생성기가 갱신)
 │   └── archive/YYYY-MM-DD.json
-├── scripts/build-feed.mjs   # 오늘 items → feed.json 병합/트림/아카이브
+├── scripts/build-feed.mjs   # 오늘 items → feed.json 병합(영구 누적)/아카이브
 └── GENERATE.md              # 매일 생성 절차(예약 에이전트가 따름)
 ```
 

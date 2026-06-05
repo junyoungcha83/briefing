@@ -63,7 +63,7 @@ git commit -m "briefing: ${TODAY}"
 git push
 ```
 
-- `build-feed.mjs` 가 자동으로: 최신순 prepend → `source_url` 중복 제거 → 30일 트림 →
+- `build-feed.mjs` 가 자동으로: 최신순 prepend → `source_url` 중복 제거 → 전체 영구 보존 →
   `data/feed.json` 저장 + `data/archive/${TODAY}.json` 기록 + 기존 **샘플 데이터 제거**.
 - push 후 GitHub Pages 가 1~2분 내 자동 배포. 앱은 다음 열람 시 최신을 가져온다.
 
