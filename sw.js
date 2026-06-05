@@ -1,6 +1,6 @@
 // 정적 자산 오프라인 캐시. 캐시 이름 변경 시 옛 캐시 자동 폐기.
 // 네트워크 우선(자산·데이터 최신 우선), 실패 시 캐시 폴백.
-const CACHE = 'briefing-v1';
+const CACHE = 'briefing-v2';
 const ASSETS = [
   './',
   './index.html',

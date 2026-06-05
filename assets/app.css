@@ -48,6 +48,28 @@ body {
 .chip.active { background: var(--header); color: #fff; border-color: var(--header); }
 .chip.active .flag { box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
 
+/* 연도·월 드롭다운 + 초기화 */
+.subfilters {
+  display: flex; gap: 8px; align-items: center;
+  padding: 10px 16px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.sel {
+  appearance: none; -webkit-appearance: none;
+  border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 999px; padding: 6px 28px 6px 14px; font-size: .85rem; cursor: pointer;
+  white-space: nowrap;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+.reset {
+  border: 1px solid var(--border); background: #fff; color: var(--muted);
+  border-radius: 999px; padding: 6px 14px; font-size: .85rem; cursor: pointer;
+  white-space: nowrap; margin-left: auto;
+}
+.reset:active { background: var(--border); }
+
 /* 깃발 — CSS 로 그린 작은 깃발(파란 깃발 이모지가 없어 CSS 사용) */
 .flag {
   position: relative; display: inline-block;

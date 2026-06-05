@@ -9,6 +9,8 @@ const CAT = {
 
 let allItems = [];
 let activeCat = 'all';
+let activeYear = '';   // '' = 전체 연도, 아니면 'YYYY'
+let activeMonth = '';  // '' = 전체 월, 아니면 'MM'
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => (
@@ -51,6 +53,7 @@ async function load() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     allItems = Array.isArray(data.items) ? data.items : [];
+    populateYearOptions();
     const up = document.getElementById('updated');
     if (up) up.textContent = fmtUpdated(data.updated_at);
   } catch (e) {
@@ -66,6 +69,8 @@ function render() {
   const feed = document.getElementById('feed');
   const items = allItems
     .filter(it => activeCat === 'all' || it.category === activeCat)
+    .filter(it => !activeYear || String(it.date).slice(0, 4) === activeYear)
+    .filter(it => !activeMonth || String(it.date).slice(5, 7) === activeMonth)
     .slice()
     .sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
@@ -131,8 +136,46 @@ function bindFilters() {
   });
 }
 
+// 데이터에 존재하는 연도들을 연도 드롭다운에 채운다(내림차순). 기존 선택은 유지.
+function populateYearOptions() {
+  const sel = document.getElementById('yearSel');
+  if (!sel) return;
+  const years = [...new Set(allItems.map(it => String(it.date).slice(0, 4)).filter(y => /^\d{4}$/.test(y)))]
+    .sort((a, b) => b.localeCompare(a));
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">전체 연도</option>' +
+    years.map(y => `<option value="${y}">${y}년</option>`).join('');
+  // 이전 선택이 여전히 유효하면 유지
+  sel.value = years.includes(prev) ? prev : '';
+  activeYear = sel.value;
+}
+
+// 연도·월 드롭다운 + 초기화 버튼 동작
+function bindSubFilters() {
+  const yearSel = document.getElementById('yearSel');
+  const monthSel = document.getElementById('monthSel');
+  const resetBtn = document.getElementById('resetBtn');
+  if (yearSel) yearSel.onchange = () => { activeYear = yearSel.value; render(); };
+  if (monthSel) monthSel.onchange = () => { activeMonth = monthSel.value; render(); };
+  if (resetBtn) resetBtn.onclick = () => {
+    // 모든 필터 초기화 → 전체 보기
+    activeCat = 'all';
+    activeYear = '';
+    activeMonth = '';
+    if (yearSel) yearSel.value = '';
+    if (monthSel) monthSel.value = '';
+    document.querySelectorAll('#filters .chip').forEach(b => {
+      const on = b.dataset.cat === 'all';
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    render();
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   bindFilters();
+  bindSubFilters();
   load();
   // 다시 보일 때 최신으로 갱신 (매일 6시 업데이트 반영)
   document.addEventListener('visibilitychange', () => {
