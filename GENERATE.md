@@ -67,6 +67,39 @@ git push
   `data/feed.json` 저장 + `data/archive/${TODAY}.json` 기록 + 기존 **샘플 데이터 제거**.
 - push 후 GitHub Pages 가 1~2분 내 자동 배포. 앱은 다음 열람 시 최신을 가져온다.
 
-## 5. 마무리 보고 (예약 실행 로그)
+## 5. 주식 알아보기 — 자동매매 모의투자 일일 리포트 (`data/stock.json`)
 
-- 게시 건수(부동산/경제), 빠진 항목 사유(있으면) 한 줄 요약.
+앱의 **'알아보기' 탭**에 표시되는 하루치 리포트. 별도 프로그램 `~/stock-autotrader`(모의/페이퍼 포트폴리오)가
+매일 텔레그램으로 보낸 요약을 **초보자도 이해하기 쉬운 보고서**로 재구성한다. **읽기 전용**으로 상태 파일을 참고할 뿐,
+자동매매 프로그램은 절대 실행·수정하지 않는다.
+
+### 5-1. 입력 파일 읽기 (절대경로)
+- `~/stock-autotrader/paper_portfolio.json` — `cash_krw`, `positions[]`(symbol·market·shares·avg_price), `realized_pnl_krw`.
+- `~/stock-autotrader/paper_state.json` — 종목별 `entry`(매수일)·`sleeve`(전략), `_equity_marks`.
+- `~/stock-autotrader/reports/paper_equity.csv` — 일자별 자산곡선(컬럼: date, equity, cash, n_pos, realized, unrealized).
+- `~/stock-autotrader/data/telegram-log/${TODAY}.jsonl`(없으면 어제자) — 봇이 실제 보낸 메시지들(`{ts,text}` 줄들) → `telegram_raw`.
+
+### 5-2. 값 계산
+- `equity`/`cash`/`realized_cum`/`unrealized`/`n_pos` = 상태 파일·csv 최신행에서.
+- `day_change` = paper_equity.csv **최신행 equity − 직전행 equity**, `day_change_pct` = 그 비율(%).
+- `holdings` = positions 를 한글 종목명 병기(예 UNH=유나이티드헬스, JPM=JP모건, 035720=카카오, 055550=신한지주,
+  017670=SK텔레콤). `note` 에 매수일·전략 등 짧게.
+- `trades` = 오늘 로그의 매매줄(🔵매수/🔴🟢매도) 또는 `entry`가 오늘인 종목 → `action`(buy/sell)·이름·**쉬운 이유**.
+
+### 5-3. 작성 원칙 (중요)
+- 상태·로그의 **사실만**. 추측·예측·수익률 전망·환각 **금지**.
+- **모의(페이퍼)투자**임을 `one_liner`에 명시(배지는 앱이 자동 표시).
+- `terms` 에 초보자용 용어 풀이(예: 낙폭과대·평균회귀(meanrev)=많이 떨어진 주식이 평균으로 되돌아온다고 보고 싸게 사는 전략).
+- 앱은 **PUBLIC(GitHub Pages)** → 계좌번호·토큰·실계좌 정보 **금지**, 모의 포트폴리오 내용만.
+
+### 5-4. 게시
+```bash
+# data/_stock_today.json 작성(Write): 위 필드로 채운 report 1개
+node scripts/build-stock.mjs data/_stock_today.json     # data/stock.json 에 병합(같은 날짜는 교체)
+rm -f data/_stock_today.json
+# (4의 feed 커밋과 함께) git add -A && git commit && git push
+```
+
+## 6. 마무리 보고 (예약 실행 로그)
+
+- 게시 건수(부동산/경제), 주식 리포트 생성 여부, 빠진 항목 사유(있으면) 한 줄 요약.

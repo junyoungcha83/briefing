@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>브리핑</title>
-<link rel="stylesheet" href="assets/app.css?v=2" />
+<link rel="stylesheet" href="assets/app.css?v=3" />
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest" />
@@ -24,39 +24,52 @@
   <span class="updated" id="updated"></span>
 </header>
 
-<nav class="filters" id="filters" role="tablist" aria-label="분류">
-  <button class="chip active" data-cat="all" role="tab" aria-selected="true">전체</button>
-  <button class="chip" data-cat="realestate" role="tab" aria-selected="false"><span class="flag realestate"></span>부동산</button>
-  <button class="chip" data-cat="economy" role="tab" aria-selected="false"><span class="flag economy"></span>경제</button>
+<nav class="viewtabs" id="viewtabs" role="tablist" aria-label="보기 전환">
+  <button class="vtab active" data-view="news" role="tab" aria-selected="true">📰 뉴스</button>
+  <button class="vtab" data-view="stock" role="tab" aria-selected="false">📈 알아보기</button>
 </nav>
 
-<div class="subfilters" id="subfilters">
-  <select class="sel" id="yearSel" aria-label="연도 선택">
-    <option value="">전체 연도</option>
-  </select>
-  <select class="sel" id="monthSel" aria-label="월 선택">
-    <option value="">전체 월</option>
-    <option value="01">1월</option>
-    <option value="02">2월</option>
-    <option value="03">3월</option>
-    <option value="04">4월</option>
-    <option value="05">5월</option>
-    <option value="06">6월</option>
-    <option value="07">7월</option>
-    <option value="08">8월</option>
-    <option value="09">9월</option>
-    <option value="10">10월</option>
-    <option value="11">11월</option>
-    <option value="12">12월</option>
-  </select>
-  <button class="reset" id="resetBtn" type="button">초기화</button>
+<div class="view" id="view-news">
+  <nav class="filters" id="filters" role="tablist" aria-label="분류">
+    <button class="chip active" data-cat="all" role="tab" aria-selected="true">전체</button>
+    <button class="chip" data-cat="realestate" role="tab" aria-selected="false"><span class="flag realestate"></span>부동산</button>
+    <button class="chip" data-cat="economy" role="tab" aria-selected="false"><span class="flag economy"></span>경제</button>
+  </nav>
+
+  <div class="subfilters" id="subfilters">
+    <select class="sel" id="yearSel" aria-label="연도 선택">
+      <option value="">전체 연도</option>
+    </select>
+    <select class="sel" id="monthSel" aria-label="월 선택">
+      <option value="">전체 월</option>
+      <option value="01">1월</option>
+      <option value="02">2월</option>
+      <option value="03">3월</option>
+      <option value="04">4월</option>
+      <option value="05">5월</option>
+      <option value="06">6월</option>
+      <option value="07">7월</option>
+      <option value="08">8월</option>
+      <option value="09">9월</option>
+      <option value="10">10월</option>
+      <option value="11">11월</option>
+      <option value="12">12월</option>
+    </select>
+    <button class="reset" id="resetBtn" type="button">초기화</button>
+  </div>
+
+  <main class="feed" id="feed">
+    <div class="loading" id="loading">불러오는 중…</div>
+  </main>
 </div>
 
-<main class="feed" id="feed">
-  <div class="loading" id="loading">불러오는 중…</div>
-</main>
+<div class="view hidden" id="view-stock">
+  <main class="stock" id="stock">
+    <div class="loading">불러오는 중…</div>
+  </main>
+</div>
 
-<script src="assets/app.js?v=2"></script>
+<script src="assets/app.js?v=3"></script>
 <script>
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

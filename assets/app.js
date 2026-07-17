@@ -173,12 +173,125 @@ function bindSubFilters() {
   };
 }
 
+// ── 알아보기(자동매매 모의투자 일일 리포트) ──────────────
+const STOCK_URL = 'data/stock.json';
+let stockReports = null;   // null=아직 안 불러옴
+let activeView = 'news';
+
+const wonKR = n => (typeof n === 'number' && Number.isFinite(n)) ? Math.round(n).toLocaleString('ko-KR') : '—';
+const signed = n => (typeof n === 'number' && Number.isFinite(n)) ? (n > 0 ? '+' : '') + Math.round(n).toLocaleString('ko-KR') : '—';
+
+function bindViewTabs() {
+  document.querySelectorAll('#viewtabs .vtab').forEach(btn => {
+    btn.onclick = () => {
+      activeView = btn.dataset.view;
+      document.querySelectorAll('#viewtabs .vtab').forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      const news = document.getElementById('view-news');
+      const stock = document.getElementById('view-stock');
+      if (news) news.classList.toggle('hidden', activeView !== 'news');
+      if (stock) stock.classList.toggle('hidden', activeView !== 'stock');
+      if (activeView === 'stock' && stockReports === null) loadStock();
+    };
+  });
+}
+
+async function loadStock() {
+  const box = document.getElementById('stock');
+  try {
+    const res = await fetch(`${STOCK_URL}?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    stockReports = Array.isArray(data.reports) ? data.reports : [];
+  } catch (e) {
+    stockReports = [];
+    if (box) box.innerHTML = `<div class="empty">아직 리포트가 없어요. 자동매매 일일 요약이 쌓이면 여기에 표시됩니다.</div>`;
+    return;
+  }
+  renderStock();
+}
+
+function statCell(label, value, cls) {
+  return `<div class="st-cell ${cls || ''}"><span class="st-label">${escapeHtml(label)}</span><span class="st-val">${value}</span></div>`;
+}
+
+function renderStock() {
+  const box = document.getElementById('stock');
+  if (!box) return;
+  const reports = (stockReports || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  if (!reports.length) {
+    box.innerHTML = `<div class="empty">아직 리포트가 없어요.</div>`;
+    return;
+  }
+  box.innerHTML = reports.map(r => {
+    const chCls = (typeof r.day_change === 'number') ? (r.day_change > 0 ? 'up' : (r.day_change < 0 ? 'down' : '')) : '';
+    const chTxt = (typeof r.day_change === 'number')
+      ? `${signed(r.day_change)}원${typeof r.day_change_pct === 'number' ? ` (${r.day_change_pct > 0 ? '+' : ''}${r.day_change_pct}%)` : ''}`
+      : '—';
+    const stats = `<div class="st-grid">
+      ${statCell('자산', wonKR(r.equity) + '원')}
+      ${statCell('전일대비', chTxt, chCls)}
+      ${statCell('실현손익 누계', signed(r.realized_cum) + '원')}
+      ${statCell('평가손익', signed(r.unrealized) + '원')}
+      ${statCell('보유', (r.n_pos ?? (r.holdings ? r.holdings.length : 0)) + '종목')}
+      ${statCell('현금', wonKR(r.cash) + '원')}
+    </div>`;
+
+    const trades = (r.trades && r.trades.length)
+      ? `<div class="rp-sec"><h3>오늘 매매</h3>${r.trades.map(t => {
+          const buy = t.action !== 'sell';
+          return `<div class="trade ${buy ? 'buy' : 'sell'}"><span class="tr-tag">${buy ? '🟢 샀어요' : '🔴 팔았어요'}</span>
+            <b>${escapeHtml(t.name || t.ticker || '')}</b>${t.ticker ? ` <span class="tk">${escapeHtml(t.ticker)}</span>` : ''}
+            <div class="tr-reason">${escapeHtml(t.reason || '')}</div></div>`;
+        }).join('')}</div>`
+      : `<div class="rp-sec"><h3>오늘 매매</h3><div class="muted">오늘은 사고판 종목이 없어요.</div></div>`;
+
+    const holds = (r.holdings && r.holdings.length)
+      ? `<div class="rp-sec"><h3>보유 종목</h3><div class="holds">${r.holdings.map(h =>
+          `<div class="hold"><span class="hd-flag ${h.market === 'us' ? 'us' : 'kr'}">${h.market === 'us' ? '🇺🇸' : '🇰🇷'}</span>
+            <b>${escapeHtml(h.name || h.ticker || '')}</b> <span class="tk">${escapeHtml(h.ticker || '')}</span>
+            <span class="hd-sh">${h.shares != null ? escapeHtml(h.shares) + '주' : ''}</span>
+            ${h.note ? `<div class="hd-note">${escapeHtml(h.note)}</div>` : ''}</div>`
+        ).join('')}</div></div>`
+      : '';
+
+    const note = r.market_note ? `<div class="rp-sec"><h3>시장 코멘트</h3><div class="body">${bodyHtml(r.market_note)}</div></div>` : '';
+
+    const terms = (r.terms && r.terms.length)
+      ? `<div class="rp-sec"><h3>용어 풀이</h3>${r.terms.map(t =>
+          `<div class="term"><b>${escapeHtml(t.term || '')}</b><span>${escapeHtml(t.plain || '')}</span></div>`).join('')}</div>`
+      : '';
+
+    const raw = (r.telegram_raw && r.telegram_raw.length)
+      ? `<details class="rp-raw"><summary>텔레그램 원문 보기</summary><pre>${escapeHtml(r.telegram_raw.join('\n\n'))}</pre></details>`
+      : '';
+
+    return `<article class="report">
+      <div class="rp-head"><span class="rp-date">${escapeHtml(fmtDateHeader(r.date))}</span><span class="rp-badge">모의투자</span></div>
+      ${r.one_liner ? `<div class="rp-oneliner">${escapeHtml(r.one_liner)}</div>` : ''}
+      ${stats}
+      ${trades}
+      ${holds}
+      ${note}
+      ${terms}
+      ${raw}
+    </article>`;
+  }).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   bindFilters();
   bindSubFilters();
+  bindViewTabs();
   load();
   // 다시 보일 때 최신으로 갱신 (매일 6시 업데이트 반영)
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') load();
+    if (document.visibilityState === 'visible') {
+      load();
+      if (activeView === 'stock') loadStock();
+    }
   });
 });

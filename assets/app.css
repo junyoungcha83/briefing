@@ -141,3 +141,98 @@ body {
 .origin:active { opacity: .6; }
 
 .card.open .headline { color: #111827; }
+
+/* ── 상위 뷰 탭 (뉴스 / 알아보기) ── */
+.viewtabs {
+  position: sticky; top: 0; z-index: 9;
+  display: flex; gap: 6px; padding: 8px 16px;
+  background: var(--header); border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.vtab {
+  flex: 1; border: none; border-radius: 10px; padding: 9px 10px;
+  background: rgba(255,255,255,.08); color: #cbd5e1;
+  font-size: .9rem; font-weight: 700; cursor: pointer;
+}
+.vtab.active { background: #fff; color: var(--header); }
+.view.hidden { display: none; }
+
+/* ── 알아보기: 리포트 ── */
+.stock {
+  max-width: 720px; margin: 0 auto;
+  padding: 12px 12px calc(28px + var(--safe-bottom));
+}
+.report {
+  background: var(--card); border: 1px solid var(--border);
+  border-left: 4px solid #10b981;
+  border-radius: 12px; padding: 14px; margin-bottom: 12px;
+}
+.rp-head { display: flex; align-items: center; gap: 8px; }
+.rp-date { font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; }
+.rp-badge {
+  margin-left: auto; font-size: .68rem; font-weight: 800;
+  color: #047857; background: #d1fae5; border-radius: 999px; padding: 3px 9px;
+}
+.rp-oneliner { margin-top: 8px; font-size: .95rem; font-weight: 600; color: #111827; line-height: 1.5; }
+
+.st-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  margin: 12px 0 6px;
+}
+.st-cell {
+  background: #f8fafc; border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px 10px; display: flex; flex-direction: column; gap: 2px;
+}
+.st-label { font-size: .68rem; color: var(--muted); font-weight: 600; }
+.st-val { font-size: .92rem; font-weight: 800; letter-spacing: -0.01em; }
+.st-cell.up .st-val { color: #dc2626; }
+.st-cell.down .st-val { color: #2563eb; }
+
+.rp-sec { margin-top: 14px; }
+.rp-sec > h3 {
+  font-size: .82rem; font-weight: 800; color: var(--muted);
+  margin: 0 0 7px; text-transform: none;
+}
+.rp-sec .body { font-size: .92rem; color: #1f2937; line-height: 1.65; }
+.muted { color: var(--muted); font-size: .88rem; }
+
+.trade {
+  border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; margin-bottom: 7px;
+}
+.trade.buy { background: #ecfdf5; border-color: #a7f3d0; }
+.trade.sell { background: #fef2f2; border-color: #fecaca; }
+.tr-tag { font-size: .74rem; font-weight: 800; margin-right: 6px; }
+.trade.buy .tr-tag { color: #047857; }
+.trade.sell .tr-tag { color: #b91c1c; }
+.trade b { font-size: .95rem; }
+.tk { color: var(--muted); font-size: .78rem; font-weight: 600; }
+.tr-reason { margin-top: 5px; font-size: .88rem; color: #374151; line-height: 1.55; }
+
+.holds { display: flex; flex-direction: column; gap: 6px; }
+.hold {
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 11px;
+  font-size: .9rem;
+}
+.hold b { font-weight: 700; }
+.hd-flag { margin-right: 5px; }
+.hd-sh { color: var(--muted); font-size: .82rem; margin-left: 6px; }
+.hd-note { margin-top: 3px; color: var(--muted); font-size: .8rem; }
+
+.term { margin-bottom: 8px; font-size: .88rem; line-height: 1.55; }
+.term b { display: block; color: #111827; font-weight: 800; margin-bottom: 1px; }
+.term span { color: #374151; }
+
+.rp-raw { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
+.rp-raw summary {
+  cursor: pointer; font-size: .82rem; color: var(--link); font-weight: 700;
+  list-style: none;
+}
+.rp-raw summary::-webkit-details-marker { display: none; }
+.rp-raw summary::before { content: "▸ "; }
+.rp-raw[open] summary::before { content: "▾ "; }
+.rp-raw pre {
+  margin: 9px 0 0; padding: 10px 12px; background: #f8fafc;
+  border: 1px solid var(--border); border-radius: 10px;
+  font-size: .8rem; color: #374151; line-height: 1.5;
+  white-space: pre-wrap; word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
