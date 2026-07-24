@@ -218,6 +218,66 @@ function statCell(label, value, cls) {
   return `<div class="st-cell ${cls || ''}"><span class="st-label">${escapeHtml(label)}</span><span class="st-val">${value}</span></div>`;
 }
 
+// ── 수익률 정리(주간/월간) ─────────────────────────────
+function periodOf(dateStr, unit) {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (unit === 'month') {
+    return { key: String(dateStr).slice(0, 7), label: `${d.getFullYear()}년 ${d.getMonth() + 1}월` };
+  }
+  const dow = (d.getDay() + 6) % 7;                       // 0 = 월요일
+  const mon = new Date(d); mon.setDate(d.getDate() - dow);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const p2 = n => String(n).padStart(2, '0');
+  return {
+    key: `${mon.getFullYear()}-${p2(mon.getMonth() + 1)}-${p2(mon.getDate())}`,
+    label: `${mon.getMonth() + 1}/${mon.getDate()}–${sun.getMonth() + 1}/${sun.getDate()}`,
+  };
+}
+function summarizeReturns(reports, unit) {
+  const asc = reports.slice().filter(r => typeof r.equity === 'number')
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const groups = new Map();
+  for (const r of asc) {
+    const { key, label } = periodOf(r.date, unit);
+    let g = groups.get(key);
+    if (!g) { g = { key, label, first: r, last: r, days: 0 }; groups.set(key, g); }
+    g.last = r; g.days++;
+  }
+  const rows = [];
+  for (const g of groups.values()) {
+    const base = (typeof g.first.day_change === 'number') ? g.first.equity - g.first.day_change : g.first.equity;
+    const end = g.last.equity;
+    const abs = end - base;
+    rows.push({ key: g.key, label: g.label, end, abs, pct: base ? (abs / base) * 100 : null, days: g.days });
+  }
+  return rows.sort((a, b) => b.key.localeCompare(a.key));  // 최신 기간 먼저
+}
+function returnTable(rows, emoji, title) {
+  if (!rows.length) return '';
+  const body = rows.map(r => {
+    const cls = r.abs > 0 ? 'up' : (r.abs < 0 ? 'down' : '');
+    const pct = (r.pct == null) ? '—' : `${r.pct > 0 ? '+' : ''}${r.pct.toFixed(2)}%`;
+    return `<tr>
+      <td class="rt-period">${escapeHtml(r.label)}</td>
+      <td class="rt-num ${cls}"><b>${pct}</b></td>
+      <td class="rt-num ${cls}">${signed(r.abs)}원</td>
+      <td class="rt-num rt-eq">${wonKR(r.end)}원</td>
+      <td class="rt-num rt-days">${r.days}일</td>
+    </tr>`;
+  }).join('');
+  return `<section class="ret-block">
+    <div class="ret-head"><h3>${emoji} ${title}</h3><span class="ret-hint">기간 시작가 대비 · 모의투자</span></div>
+    <div class="ret-scroll"><table class="ret-table">
+      <thead><tr><th>기간</th><th>수익률</th><th>변동액</th><th>기말 자산</th><th>일수</th></tr></thead>
+      <tbody>${body}</tbody></table></div>
+  </section>`;
+}
+function renderReturns(reports) {
+  const m = returnTable(summarizeReturns(reports, 'month'), '📅', '월간 수익률');
+  const w = returnTable(summarizeReturns(reports, 'week'), '🗓️', '주간 수익률');
+  return (m || w) ? `<div class="ret-wrap">${m}${w}</div>` : '';
+}
+
 function renderStock() {
   const box = document.getElementById('stock');
   if (!box) return;
@@ -226,7 +286,7 @@ function renderStock() {
     box.innerHTML = `<div class="empty">아직 리포트가 없어요.</div>`;
     return;
   }
-  box.innerHTML = reports.map(r => {
+  box.innerHTML = renderReturns(reports) + reports.map(r => {
     const chCls = (typeof r.day_change === 'number') ? (r.day_change > 0 ? 'up' : (r.day_change < 0 ? 'down' : '')) : '';
     const chTxt = (typeof r.day_change === 'number')
       ? `${signed(r.day_change)}원${typeof r.day_change_pct === 'number' ? ` (${r.day_change_pct > 0 ? '+' : ''}${r.day_change_pct}%)` : ''}`

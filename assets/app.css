@@ -195,6 +195,33 @@ body {
 .rp-sec .body { font-size: .92rem; color: #1f2937; line-height: 1.65; }
 .muted { color: var(--muted); font-size: .88rem; }
 
+/* ── 수익률 정리(주간/월간) ── */
+.ret-wrap { display: grid; gap: 12px; margin-bottom: 14px; }
+.ret-block {
+  background: var(--card); border: 1px solid var(--border);
+  border-left: 4px solid #6366f1; border-radius: 12px; padding: 12px 14px;
+}
+.ret-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.ret-head h3 { margin: 0; font-size: .92rem; font-weight: 800; letter-spacing: -0.01em; }
+.ret-hint { margin-left: auto; font-size: .68rem; color: var(--muted); font-weight: 600; }
+.ret-scroll { overflow-x: auto; }
+.ret-table { width: 100%; min-width: 380px; border-collapse: collapse; font-size: .86rem; }
+.ret-table th {
+  font-size: .68rem; font-weight: 700; color: var(--muted); text-transform: none;
+  padding: 4px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap;
+}
+.ret-table th:first-child { text-align: left; }
+.ret-table td {
+  padding: 8px; border-bottom: 1px solid var(--border);
+  text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.ret-table tr:last-child td { border-bottom: 0; }
+.ret-table .rt-period { text-align: left; font-weight: 700; }
+.ret-table .rt-num.up { color: #dc2626; }
+.ret-table .rt-num.down { color: #2563eb; }
+.ret-table .rt-eq { font-weight: 700; }
+.ret-table .rt-days { color: var(--muted); }
+
 .trade {
   border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; margin-bottom: 7px;
 }
