@@ -1,7 +1,98 @@
 {
   "version": 1,
-  "updated_at": "2026-07-29T10:00:44.730232Z",
+  "updated_at": "2026-07-30T10:00:40.167708Z",
   "reports": [
+    {
+      "date": "2026-07-30",
+      "one_liner": "모의투자 · 오늘은 매매 없이 보유를 유지했고, 자산은 -4,836원(-0.01%) 변동했어요.",
+      "equity": 32517276,
+      "day_change": -4836,
+      "day_change_pct": -0.01,
+      "realized_cum": 2600269,
+      "unrealized": 264331,
+      "cash": 25896586,
+      "n_pos": 9,
+      "holdings": [
+        {
+          "name": "유나이티드헬스",
+          "ticker": "UNH",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "JP모건",
+          "ticker": "JPM",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "홈디포",
+          "ticker": "HD",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "존슨앤존슨",
+          "ticker": "JNJ",
+          "market": "us",
+          "shares": 2,
+          "note": ""
+        },
+        {
+          "name": "셀트리온",
+          "ticker": "068270",
+          "market": "kr",
+          "shares": 6,
+          "note": ""
+        },
+        {
+          "name": "코카콜라",
+          "ticker": "KO",
+          "market": "us",
+          "shares": 5,
+          "note": ""
+        },
+        {
+          "name": "화이자",
+          "ticker": "PFE",
+          "market": "us",
+          "shares": 33,
+          "note": ""
+        },
+        {
+          "name": "비자",
+          "ticker": "V",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "마이크로소프트",
+          "ticker": "MSFT",
+          "market": "us",
+          "shares": 2,
+          "note": ""
+        }
+      ],
+      "trades": [],
+      "market_note": "오늘은 사고판 종목 없이 9개 종목을 그대로 보유했어요. 자산은 전일보다 -4,836원(-0.01%) 움직였습니다. 모두 실제 돈이 아닌 모의투자 기록이에요.",
+      "terms": [
+        {
+          "term": "모의투자(페이퍼)",
+          "plain": "실제 돈을 넣지 않고, 진짜처럼 사고팔았다고 가정해 성과를 기록하는 연습 투자예요."
+        },
+        {
+          "term": "실현손익 / 평가손익",
+          "plain": "실현손익은 이미 팔아서 확정된 이익, 평가손익은 아직 안 팔고 들고 있는 종목의 현재 이익(장부상)이에요."
+        }
+      ],
+      "telegram_raw": [
+        "📈 페이퍼 2026-07-30 · 자산 32,517,276원\n실현누계 +2,600,269 · 평가 +264,331 · 보유 9종목\n오늘 3건\n🔴 [meanrev] 20일선 이탈(손실) CSCO 7주\n🟢 [역추세] 부분익절 V 1주 (+1%)\n🔵 [meanrev] 매수 MSFT 2주 @ 390.54"
+      ]
+    },
     {
       "date": "2026-07-29",
       "one_liner": "모의투자 · 오늘은 매매 없이 보유를 유지했고, 자산은 -44,075원(-0.14%) 변동했어요.",
