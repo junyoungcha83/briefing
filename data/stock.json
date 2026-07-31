@@ -1,7 +1,112 @@
 {
   "version": 1,
-  "updated_at": "2026-07-30T10:00:40.167708Z",
+  "updated_at": "2026-07-31T10:00:36.702999Z",
   "reports": [
+    {
+      "date": "2026-07-31",
+      "one_liner": "모의투자 · 오늘은 매매 없이 보유를 유지했고, 자산은 +97,978원(+0.3%) 변동했어요.",
+      "equity": 32615254,
+      "day_change": 97978,
+      "day_change_pct": 0.3,
+      "realized_cum": 2762563,
+      "unrealized": 203181,
+      "cash": 24240412,
+      "n_pos": 11,
+      "holdings": [
+        {
+          "name": "유나이티드헬스",
+          "ticker": "UNH",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "JP모건",
+          "ticker": "JPM",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "홈디포",
+          "ticker": "HD",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "존슨앤존슨",
+          "ticker": "JNJ",
+          "market": "us",
+          "shares": 2,
+          "note": ""
+        },
+        {
+          "name": "셀트리온",
+          "ticker": "068270",
+          "market": "kr",
+          "shares": 6,
+          "note": ""
+        },
+        {
+          "name": "코카콜라",
+          "ticker": "KO",
+          "market": "us",
+          "shares": 5,
+          "note": ""
+        },
+        {
+          "name": "화이자",
+          "ticker": "PFE",
+          "market": "us",
+          "shares": 33,
+          "note": ""
+        },
+        {
+          "name": "비자",
+          "ticker": "V",
+          "market": "us",
+          "shares": 1,
+          "note": ""
+        },
+        {
+          "name": "LG화학",
+          "ticker": "051910",
+          "market": "kr",
+          "shares": 4,
+          "note": ""
+        },
+        {
+          "name": "포스코홀딩스",
+          "ticker": "005490",
+          "market": "kr",
+          "shares": 3,
+          "note": ""
+        },
+        {
+          "name": "애플",
+          "ticker": "AAPL",
+          "market": "us",
+          "shares": 2,
+          "note": ""
+        }
+      ],
+      "trades": [],
+      "market_note": "오늘은 사고판 종목 없이 11개 종목을 그대로 보유했어요. 자산은 전일보다 +97,978원(+0.3%) 움직였습니다. 모두 실제 돈이 아닌 모의투자 기록이에요.",
+      "terms": [
+        {
+          "term": "모의투자(페이퍼)",
+          "plain": "실제 돈을 넣지 않고, 진짜처럼 사고팔았다고 가정해 성과를 기록하는 연습 투자예요."
+        },
+        {
+          "term": "실현손익 / 평가손익",
+          "plain": "실현손익은 이미 팔아서 확정된 이익, 평가손익은 아직 안 팔고 들고 있는 종목의 현재 이익(장부상)이에요."
+        }
+      ],
+      "telegram_raw": [
+        "📈 페이퍼 2026-07-31 · 자산 32,615,254원\n실현누계 +2,762,563 · 평가 +203,181 · 보유 11종목\n오늘 4건\n🔴 [meanrev] 익절2/과열 +16% MSFT 2주\n🔵 [meanrev] 매수 051910 4주 @ 258,000.00\n🔵 [meanrev] 매수 005490 3주 @ 312,500.00\n🔵 [meanrev] 매수 AAPL 2주 @ 333.43"
+      ]
+    },
     {
       "date": "2026-07-30",
       "one_liner": "모의투자 · 오늘은 매매 없이 보유를 유지했고, 자산은 -4,836원(-0.01%) 변동했어요.",
