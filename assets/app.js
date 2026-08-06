@@ -272,10 +272,51 @@ function returnTable(rows, emoji, title) {
       <tbody>${body}</tbody></table></div>
   </section>`;
 }
-function renderReturns(reports) {
-  const m = returnTable(summarizeReturns(reports, 'month'), '📅', '월간 수익률');
-  const w = returnTable(summarizeReturns(reports, 'week'), '🗓️', '주간 수익률');
-  return (m || w) ? `<div class="ret-wrap">${m}${w}</div>` : '';
+// 알아보기 서브탭 / 자세히 단위 상태
+let _stockSub = 'daily';     // 'daily' | 'detail'
+let _detailUnit = 'month';   // 'month' | 'week'
+
+// 수익률 막대그래프(인라인 SVG) — 기간별 수익률(%)
+function returnBarChart(rows) {
+  if (!rows.length) return `<div class="muted">기간 데이터가 아직 부족해요.</div>`;
+  const asc = rows.slice().sort((a, b) => a.key.localeCompare(b.key));
+  const maxAbs = Math.max(0.01, ...asc.map(r => Math.abs(r.pct || 0)));
+  const n = asc.length, bw = 46, gap = 16, padX = 30, padTop = 24, padBot = 42, plot = 150;
+  const W = padX * 2 + n * bw + Math.max(0, n - 1) * gap;
+  const H = padTop + plot + padBot;
+  const zeroY = padTop + plot / 2;
+  const scale = (plot / 2 - 8) / maxAbs;
+  let bars = '';
+  asc.forEach((r, i) => {
+    const x = padX + i * (bw + gap);
+    const pct = r.pct || 0;
+    const h = Math.max(1, Math.abs(pct) * scale);
+    const up = pct >= 0;
+    const y = up ? zeroY - h : zeroY;
+    const color = up ? '#dc2626' : '#2563eb';
+    bars += `<rect x="${x}" y="${y.toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="4" fill="${color}"/>`;
+    bars += `<text x="${x + bw / 2}" y="${(up ? y - 6 : y + h + 14).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${color}">${pct > 0 ? '+' : ''}${pct.toFixed(2)}%</text>`;
+    bars += `<text x="${x + bw / 2}" y="${H - 14}" text-anchor="middle" font-size="10.5" fill="#64748b">${escapeHtml(r.label)}</text>`;
+  });
+  return `<div class="ret-chart-wrap"><svg class="ret-chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${_detailUnit === 'month' ? '월간' : '주간'} 수익률 추이">
+    <line x1="${padX - 8}" y1="${zeroY}" x2="${W - padX + 8}" y2="${zeroY}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3"/>
+    ${bars}
+  </svg></div>`;
+}
+function stockDetailHTML(reports) {
+  const rows = summarizeReturns(reports, _detailUnit);
+  const unitLabel = _detailUnit === 'month' ? '월간' : '주간';
+  const emoji = _detailUnit === 'month' ? '📅' : '🗓️';
+  return `
+    <div class="ret-unit">
+      <button class="ret-unit-btn ${_detailUnit === 'month' ? 'on' : ''}" type="button" data-unit="month">📅 월간</button>
+      <button class="ret-unit-btn ${_detailUnit === 'week' ? 'on' : ''}" type="button" data-unit="week">🗓️ 주간</button>
+    </div>
+    <section class="ret-block">
+      <div class="ret-head"><h3>${emoji} ${unitLabel} 수익률 추이</h3><span class="ret-hint">기간 시작가 대비 · 모의투자</span></div>
+      ${returnBarChart(rows)}
+    </section>
+    ${returnTable(rows, emoji, unitLabel + ' 상세')}`;
 }
 
 function renderStock() {
@@ -286,7 +327,17 @@ function renderStock() {
     box.innerHTML = `<div class="empty">아직 리포트가 없어요.</div>`;
     return;
   }
-  box.innerHTML = renderReturns(reports) + reports.map(r => {
+  box.innerHTML =
+    `<div class="stock-subtabs">
+       <button class="stock-subtab ${_stockSub === 'daily' ? 'on' : ''}" type="button" data-ssub="daily">📆 알아보기</button>
+       <button class="stock-subtab ${_stockSub === 'detail' ? 'on' : ''}" type="button" data-ssub="detail">📊 자세히 알아보기</button>
+     </div>
+     <div class="stock-body">${_stockSub === 'detail' ? stockDetailHTML(reports) : stockDailyHTML(reports)}</div>`;
+  document.querySelectorAll('.stock-subtab').forEach(b => b.onclick = () => { _stockSub = b.dataset.ssub; renderStock(); });
+  document.querySelectorAll('.ret-unit-btn').forEach(b => b.onclick = () => { _detailUnit = b.dataset.unit; renderStock(); });
+}
+function stockDailyHTML(reports) {
+  return reports.map(r => {
     const chCls = (typeof r.day_change === 'number') ? (r.day_change > 0 ? 'up' : (r.day_change < 0 ? 'down' : '')) : '';
     const chTxt = (typeof r.day_change === 'number')
       ? `${signed(r.day_change)}원${typeof r.day_change_pct === 'number' ? ` (${r.day_change_pct > 0 ? '+' : ''}${r.day_change_pct}%)` : ''}`
