@@ -204,6 +204,12 @@ body {
 .ret-unit { display: flex; gap: 6px; margin-bottom: 12px; }
 .ret-unit-btn { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 8px; background: var(--card); color: var(--muted); font-size: .86rem; font-weight: 800; cursor: pointer; }
 .ret-unit-btn.on { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.ret-range { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-size: .85rem; }
+.ret-range .rr-lbl { font-weight: 800; color: var(--muted); }
+.ret-range select { flex: 1 1 120px; min-width: 108px; border: 1px solid var(--border); border-radius: 8px; padding: 7px 8px; background: var(--card); color: var(--text); font-size: .85rem; font-weight: 700; }
+.ret-range .rr-sep { color: var(--muted); }
+.ret-range .rr-reset { flex: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; background: var(--card); color: var(--muted); font-weight: 800; cursor: pointer; }
+.ret-range .rr-reset.on { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
 .ret-chart-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .ret-chart { display: block; height: auto; max-width: 100%; }
 .ret-wrap { display: grid; gap: 12px; margin-bottom: 14px; }

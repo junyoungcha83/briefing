@@ -275,6 +275,7 @@ function returnTable(rows, emoji, title) {
 // 알아보기 서브탭 / 자세히 단위 상태
 let _stockSub = 'daily';     // 'daily' | 'detail'
 let _detailUnit = 'month';   // 'month' | 'week'
+let _detailFrom = null, _detailTo = null;   // 기간 범위(키). null = 전체
 
 // 수익률 막대그래프(인라인 SVG) — 기간별 수익률(%)
 function returnBarChart(rows) {
@@ -304,16 +305,32 @@ function returnBarChart(rows) {
   </svg></div>`;
 }
 function stockDetailHTML(reports) {
-  const rows = summarizeReturns(reports, _detailUnit);
   const unitLabel = _detailUnit === 'month' ? '월간' : '주간';
   const emoji = _detailUnit === 'month' ? '📅' : '🗓️';
+  const all = summarizeReturns(reports, _detailUnit).slice().sort((a, b) => a.key.localeCompare(b.key));
+  const keys = all.map(r => r.key);
+  let from = (_detailFrom && keys.includes(_detailFrom)) ? _detailFrom : (keys[0] || '');
+  let to = (_detailTo && keys.includes(_detailTo)) ? _detailTo : (keys[keys.length - 1] || '');
+  if (from && to && from > to) { const t = from; from = to; to = t; }
+  const rows = all.filter(r => (!from || r.key >= from) && (!to || r.key <= to));
+  const opt = sel => all.map(r => `<option value="${r.key}"${r.key === sel ? ' selected' : ''}>${escapeHtml(r.label)}</option>`).join('');
+  const isAll = (from === keys[0] && to === keys[keys.length - 1]);
+  const rangeUI = all.length ? `
+    <div class="ret-range">
+      <span class="rr-lbl">기간</span>
+      <select id="retFrom" aria-label="시작 기간">${opt(from)}</select>
+      <span class="rr-sep">~</span>
+      <select id="retTo" aria-label="종료 기간">${opt(to)}</select>
+      <button id="retReset" type="button" class="rr-reset${isAll ? ' on' : ''}">전체</button>
+    </div>` : '';
   return `
     <div class="ret-unit">
       <button class="ret-unit-btn ${_detailUnit === 'month' ? 'on' : ''}" type="button" data-unit="month">📅 월간</button>
       <button class="ret-unit-btn ${_detailUnit === 'week' ? 'on' : ''}" type="button" data-unit="week">🗓️ 주간</button>
     </div>
+    ${rangeUI}
     <section class="ret-block">
-      <div class="ret-head"><h3>${emoji} ${unitLabel} 수익률 추이</h3><span class="ret-hint">기간 시작가 대비 · 모의투자</span></div>
+      <div class="ret-head"><h3>${emoji} ${unitLabel} 수익률 추이</h3><span class="ret-hint">${rows.length}개 기간 · 기간 시작가 대비</span></div>
       ${returnBarChart(rows)}
     </section>
     ${returnTable(rows, emoji, unitLabel + ' 상세')}`;
@@ -334,7 +351,10 @@ function renderStock() {
      </div>
      <div class="stock-body">${_stockSub === 'detail' ? stockDetailHTML(reports) : stockDailyHTML(reports)}</div>`;
   document.querySelectorAll('.stock-subtab').forEach(b => b.onclick = () => { _stockSub = b.dataset.ssub; renderStock(); });
-  document.querySelectorAll('.ret-unit-btn').forEach(b => b.onclick = () => { _detailUnit = b.dataset.unit; renderStock(); });
+  document.querySelectorAll('.ret-unit-btn').forEach(b => b.onclick = () => { _detailUnit = b.dataset.unit; _detailFrom = null; _detailTo = null; renderStock(); });
+  const rf = document.getElementById('retFrom'); if (rf) rf.onchange = () => { _detailFrom = rf.value; renderStock(); };
+  const rt = document.getElementById('retTo'); if (rt) rt.onchange = () => { _detailTo = rt.value; renderStock(); };
+  const rr = document.getElementById('retReset'); if (rr) rr.onclick = () => { _detailFrom = null; _detailTo = null; renderStock(); };
 }
 function stockDailyHTML(reports) {
   return reports.map(r => {
