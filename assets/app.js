@@ -324,9 +324,12 @@ function stockDetailHTML(reports) {
       <button id="retReset" type="button" class="rr-reset${isAll ? ' on' : ''}">전체</button>
     </div>` : '';
   return `
-    <div class="ret-unit">
-      <button class="ret-unit-btn ${_detailUnit === 'month' ? 'on' : ''}" type="button" data-unit="month">📅 월간</button>
-      <button class="ret-unit-btn ${_detailUnit === 'week' ? 'on' : ''}" type="button" data-unit="week">🗓️ 주간</button>
+    <div class="ret-unitrow">
+      <span class="ret-unitlabel">단위</span>
+      <div class="ret-unit" role="group" aria-label="집계 단위">
+        <button class="ret-unit-btn ${_detailUnit === 'month' ? 'on' : ''}" type="button" data-unit="month">📅 월간</button>
+        <button class="ret-unit-btn ${_detailUnit === 'week' ? 'on' : ''}" type="button" data-unit="week">🗓️ 주간</button>
+      </div>
     </div>
     ${rangeUI}
     <section class="ret-block">
