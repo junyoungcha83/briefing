@@ -1,0 +1,12 @@
+name = "briefing-collection-api"
+main = "src/index.js"
+compatibility_date = "2025-05-01"
+
+# KV — 다음 명령으로 생성 후 id 채우기:
+#   npx wrangler kv namespace create COLLECTION
+[[kv_namespaces]]
+binding = "COLLECTION"
+id = "16419846552443c180290e78dd07f818"
+
+# 편집 비밀번호는 secret:
+#   npx wrangler secret put EDIT_TOKEN

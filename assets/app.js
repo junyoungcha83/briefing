@@ -65,15 +65,39 @@ async function load() {
   render();
 }
 
-// ── 기사모음(블로그작성 앱에서 수동 저장) — 같은 오리진 localStorage 공유 ──
-const COLLECTION_KEY = 'briefing-collection-v1';
-function collectionItems() {
+// ── 기사모음(블로그작성 앱에서 저장) — 서버 동기화(여러 기기) + 로컬 캐시 ──
+const COLLECTION_KEY = 'briefing-collection-v1';       // 로컬 캐시
+const COLLECTION_API = 'https://briefing-collection-api.junyoung-cha83.workers.dev';
+const COLLECTION_TOKEN_KEY = 'briefing-collection-token';
+function collectionLocal() {
   try { const l = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]'); return Array.isArray(l) ? l : []; }
   catch (e) { return []; }
 }
-function deleteCollection(id) {
-  const list = collectionItems().filter(a => a.id !== id);
+function collectionToken() { try { return localStorage.getItem(COLLECTION_TOKEN_KEY) || ''; } catch (e) { return ''; } }
+function promptCollectionToken() {
+  const v = prompt('브리핑 동기화 비밀번호를 입력하세요 (블로그작성 앱과 동일).');
+  if (v && v.trim()) { try { localStorage.setItem(COLLECTION_TOKEN_KEY, v.trim()); } catch (e) {} renderCollection(); }
+}
+async function fetchCollection() {
+  const token = collectionToken();
+  if (!token) return { needToken: true };
+  try {
+    const res = await fetch(COLLECTION_API + '/api/collection', { headers: { 'X-Edit-Token': token }, cache: 'no-store' });
+    if (res.status === 401) { try { localStorage.removeItem(COLLECTION_TOKEN_KEY); } catch (e) {} return { badToken: true }; }
+    if (res.ok) {
+      const j = await res.json();
+      const items = Array.isArray(j.items) ? j.items : [];
+      try { localStorage.setItem(COLLECTION_KEY, JSON.stringify(items)); } catch (e) {}
+      return { items };
+    }
+  } catch (e) {}
+  return { items: collectionLocal(), offline: true };   // 오프라인 → 로컬 캐시
+}
+async function deleteCollection(id) {
+  const list = collectionLocal().filter(a => a.id !== id);
   try { localStorage.setItem(COLLECTION_KEY, JSON.stringify(list)); } catch (e) {}
+  const token = collectionToken();
+  if (token) { try { await fetch(COLLECTION_API + '/api/collection', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Edit-Token': token }, body: JSON.stringify({ items: list }) }); } catch (e) {} }
   renderCollection();
 }
 function attachCardToggles(feed) {
@@ -89,12 +113,20 @@ function attachCardToggles(feed) {
     };
   });
 }
-function renderCollection() {
+async function renderCollection() {
   const feed = document.getElementById('feed');
-  const items = collectionItems().slice().sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
+  feed.innerHTML = `<div class="loading">불러오는 중…</div>`;
+  const r = await fetchCollection();
+  if (r.needToken || r.badToken) {
+    feed.innerHTML = `<div class="empty">${r.badToken ? '비밀번호가 올바르지 않아요.<br>' : ''}기사모음은 <b>동기화 비밀번호</b>가 필요해요.<br>
+      <button class="reset" id="collTokenBtn" type="button" style="margin-top:12px">🔑 비밀번호 입력</button></div>`;
+    const b = document.getElementById('collTokenBtn'); if (b) b.onclick = promptCollectionToken;
+    return;
+  }
+  const items = (r.items || []).slice().sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
   if (!items.length) {
     feed.innerHTML = `<div class="empty">아직 저장한 기사가 없어요.<br>
-      블로그작성 앱의 <b>결과</b>에서 <b>📌 브리핑에 저장</b>을 누르면 여기에 모입니다.</div>`;
+      블로그작성 앱의 <b>결과</b>에서 <b>📌 브리핑에 저장</b>을 누르면 여기에 모입니다.${r.offline ? '<br><small>(오프라인 — 캐시 표시)</small>' : ''}</div>`;
     return;
   }
   feed.innerHTML = items.map(it => `

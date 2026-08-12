@@ -1,0 +1,6 @@
+{
+  "name": "briefing-collection-api",
+  "private": true,
+  "scripts": { "deploy": "wrangler deploy" },
+  "devDependencies": { "wrangler": "^4" }
+}
