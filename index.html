@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>브리핑</title>
-<link rel="stylesheet" href="assets/app.css?v=6" />
+<link rel="stylesheet" href="assets/app.css?v=7" />
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest" />
@@ -34,6 +34,7 @@
     <button class="chip active" data-cat="all" role="tab" aria-selected="true">전체</button>
     <button class="chip" data-cat="realestate" role="tab" aria-selected="false"><span class="flag realestate"></span>부동산</button>
     <button class="chip" data-cat="economy" role="tab" aria-selected="false"><span class="flag economy"></span>경제</button>
+    <button class="chip" data-cat="collection" role="tab" aria-selected="false"><span class="flag collection"></span>📌 기사모음</button>
   </nav>
 
   <div class="subfilters" id="subfilters">
@@ -69,7 +70,7 @@
   </main>
 </div>
 
-<script src="assets/app.js?v=6"></script>
+<script src="assets/app.js?v=7"></script>
 <script>
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

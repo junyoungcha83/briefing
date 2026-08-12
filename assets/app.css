@@ -85,6 +85,12 @@ body {
 }
 .flag.realestate::after { background: var(--re); }
 .flag.economy::after    { background: var(--ec); }
+.flag.collection::after { background: #10b981; }
+.del-collection {
+  margin-left: auto; border: 1px solid var(--border); background: #fff; color: #b91c1c;
+  border-radius: 999px; padding: 5px 12px; font-size: .82rem; cursor: pointer;
+}
+.del-collection:active { background: #fee2e2; }
 
 /* 피드 */
 .feed {

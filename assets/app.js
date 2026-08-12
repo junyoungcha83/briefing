@@ -65,7 +65,65 @@ async function load() {
   render();
 }
 
+// ── 기사모음(블로그작성 앱에서 수동 저장) — 같은 오리진 localStorage 공유 ──
+const COLLECTION_KEY = 'briefing-collection-v1';
+function collectionItems() {
+  try { const l = JSON.parse(localStorage.getItem(COLLECTION_KEY) || '[]'); return Array.isArray(l) ? l : []; }
+  catch (e) { return []; }
+}
+function deleteCollection(id) {
+  const list = collectionItems().filter(a => a.id !== id);
+  try { localStorage.setItem(COLLECTION_KEY, JSON.stringify(list)); } catch (e) {}
+  renderCollection();
+}
+function attachCardToggles(feed) {
+  feed.querySelectorAll('.card').forEach(card => {
+    const head = card.querySelector('.card-head');
+    const preview = card.querySelector('.preview');
+    const full = card.querySelector('.full');
+    head.onclick = () => {
+      const open = card.classList.toggle('open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      full.hidden = !open;
+      if (preview) preview.style.display = open ? 'none' : '';
+    };
+  });
+}
+function renderCollection() {
+  const feed = document.getElementById('feed');
+  const items = collectionItems().slice().sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
+  if (!items.length) {
+    feed.innerHTML = `<div class="empty">아직 저장한 기사가 없어요.<br>
+      블로그작성 앱의 <b>결과</b>에서 <b>📌 브리핑에 저장</b>을 누르면 여기에 모입니다.</div>`;
+    return;
+  }
+  feed.innerHTML = items.map(it => `
+    <article class="card collection" data-id="${escapeAttr(it.id || '')}">
+      <button class="card-head" type="button" aria-expanded="false">
+        <span class="flag collection"></span>
+        <span class="headline">${escapeHtml(it.headline || '')}</span>
+      </button>
+      <div class="preview">${escapeHtml(it.preview || '')}</div>
+      <div class="full" hidden>
+        <div class="body">${bodyHtml(it.body || '')}</div>
+        <div class="meta">
+          ${it.source ? `<span class="src">${escapeHtml(it.source)}</span>` : ''}
+          ${it.source_url ? `<a class="origin" href="${escapeAttr(it.source_url)}" target="_blank" rel="noopener noreferrer">원문 보기 ↗</a>` : ''}
+          <button class="del-collection" type="button" data-id="${escapeAttr(it.id || '')}">🗑 삭제</button>
+        </div>
+      </div>
+    </article>`).join('');
+  attachCardToggles(feed);
+  feed.querySelectorAll('.del-collection').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    if (confirm('이 기사를 기사모음에서 삭제할까요?')) deleteCollection(b.dataset.id);
+  });
+}
+
 function render() {
+  const subf = document.getElementById('subfilters');
+  if (activeCat === 'collection') { if (subf) subf.style.display = 'none'; renderCollection(); return; }
+  if (subf) subf.style.display = '';
   const feed = document.getElementById('feed');
   const items = allItems
     .filter(it => activeCat === 'all' || it.category === activeCat)
@@ -421,11 +479,16 @@ document.addEventListener('DOMContentLoaded', () => {
   bindSubFilters();
   bindViewTabs();
   load();
-  // 다시 보일 때 최신으로 갱신 (매일 6시 업데이트 반영)
+  // 다시 보일 때 최신으로 갱신 (매일 6시 업데이트 반영 + 기사모음 반영)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       load();
+      if (activeCat === 'collection') renderCollection();
       if (activeView === 'stock') loadStock();
     }
+  });
+  // 블로그작성 앱이 다른 탭에서 저장하면(같은 오리진) 즉시 반영
+  window.addEventListener('storage', (e) => {
+    if (e.key === COLLECTION_KEY && activeCat === 'collection') renderCollection();
   });
 });
