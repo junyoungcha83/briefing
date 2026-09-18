@@ -1,7 +1,29 @@
 {
   "version": 1,
-  "updated_at": "2026-09-18T21:11:15.347Z",
+  "updated_at": "2026-09-18T21:22:01.823Z",
   "items": [
+    {
+      "id": "2026-09-19-re-1",
+      "date": "2026-09-19",
+      "category": "realestate",
+      "headline": "9월 셋째주 전국 아파트 매매 0.04% 상승…상승폭 직전주 0.22%에서 급감",
+      "preview": "한국부동산원이 발표한 9월 셋째주 전국 아파트 매매가격지수는 전주 대비 0.04% 오르며 직전주(0.22%) 대비 상승폭이 급격히 둔화됐다. 서울은 0.03%, 수도권은 경기·인천(0.07%) 중심으로 0.05% 상승했다. 대전(0.22%), 세종(0.10%), 광주(0.09%)가 올랐고 강원(-0.04%), 경남(-0.04%), 인천(-0.03%)은 하락했다. 전세가격은 전국 0.12%, 서울 0.17%, 경기·인천 0.13% 상승했다.",
+      "body": "한국부동산원이 발표한 9월 셋째주(9월 14일 기준) 전국 아파트 매매가격지수가 전주 대비 0.04% 상승했다. 직전주(0.22%)와 비교해 상승폭이 급격히 둔화된 수치다.\n\n지역별로 서울은 0.03%, 수도권은 경기·인천(0.07%) 중심으로 0.05% 올랐다. 지방에서는 대전(0.22%), 세종(0.10%), 광주(0.09%), 경기(0.08%) 순으로 상승했다. 반면 강원(-0.04%), 경남(-0.04%), 인천(-0.03%)은 하락세를 나타냈다.\n\n전세 시장에서는 전국이 0.12% 상승한 가운데 서울이 0.17%, 경기·인천이 0.13% 올랐다. 전반적으로 아파트 매매 상승폭이 큰 폭으로 줄어드는 추세가 나타나고 있으나 전세가격은 상승세를 이어가고 있다.",
+      "source": "아시아타임",
+      "source_url": "https://www.asiatime.co.kr/article/20260918500323",
+      "lang_original": "ko"
+    },
+    {
+      "id": "2026-09-19-econ-2",
+      "date": "2026-09-19",
+      "category": "economy",
+      "headline": "SEC, 가상자산 전용 공모 규정 'Regulation Crypto Assets' 첫 제안…스타트업 500만 달러 면제",
+      "preview": "미 증권거래위원회(SEC)가 8월 18일 가상자산(crypto assets) 특화 규정인 'Regulation Crypto Assets'를 처음으로 제안했다. 약 10년 만에 처음으로 마련하는 가상자산 전용 공모 체계로, 스타트업용 500만 달러 면제와 연간 7,500만 달러 자금조달 면제 두 가지 등록 면제를 신설한다. 토큰이 증권 지위를 벗어날 수 있는 안전항(safe harbor) 조항도 포함됐으며 의견 제출 마감은 2026년 10월 20일이다.",
+      "body": "미 증권거래위원회(SEC, Securities and Exchange Commission)는 8월 18일(현지시간) 가상자산(crypto assets) 특화 규정인 'Regulation Crypto Assets'(규칙 번호 S7-2026-27) 초안을 제안했다.\n\n이번 제안은 약 10년간 비공식 가이던스와 집행(enforcement) 위주로 운영되던 SEC의 가상자산 규제 방식에서 벗어나, 특정 가상자산 관련 투자계약(investment contract)에 대해 1933년 연방 증권법(Securities Act of 1933) 등록 없이도 공모를 허용하는 최초의 가상자산 전용 체계를 마련하는 것이다. SEC는 연방 증권법 적용 여부 명확화, 역외 이전 유인 감소, 미국 투자자 보호 강화를 목표로 제시했다.\n\n새로운 등록 면제는 두 가지다. ① 4년 통산 최대 500만 달러(USD)까지 허용하는 '스타트업 면제(startup exemption)'와 ② 12개월마다 최대 7,500만 달러까지 허용하는 '자금조달 면제(fundraising exemption)'다. 또한 발행자가 약속한 핵심 운영 노력을 완료하거나 영구 중단한 경우 토큰이 증권 지위를 벗어날 수 있는 안전항(safe harbor) 조항도 포함됐다. 의견(comment) 제출 마감은 2026년 10월 20일이다.",
+      "source": "SEC",
+      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-76-sec-proposes-new-regulation-crypto-assets",
+      "lang_original": "en"
+    },
     {
       "id": "2026-09-19-re-1",
       "date": "2026-09-19",
@@ -176,17 +198,6 @@
       "body": "연방준비제도(Fed)가 9월 16일 기준금리를 25bp 인상하자 비트코인(Bitcoin)은 24시간 기준 0.88% 상승한 $76,621를 기록하며 나스닥 강세와 함께 반등했다. 이후 비트코인 가격은 $76,000~$78,761 범위에서 횡보하고 있다.\n\n시장 심리를 나타내는 공포탐욕지수(Fear & Greed Index)는 69(탐욕 구간)를 기록 중이며, 기술적 지표인 RSI(상대강도지수, Relative Strength Index)는 55.18로 아직 신호선을 하회하고 있어 강세 전환을 확인하지 못한 상태다. 비트코인 ETF(상장지수펀드, Exchange-Traded Fund)는 8월 한 달간 약 35억 달러(USD)의 순유입을 기록했다.\n\n한편 비트코인은 8월에 24.95% 급등했으나 연초 대비로는 여전히 9.62% 하락한 수준을 유지하고 있다. 역사적으로 9월은 2013년 이후 비트코인의 평균 수익률이 약 -3%에 달하는 가장 부진한 달로, 투자자들 사이에서는 이른바 '렉템버(Rektember)' 경계심이 지속되고 있다.",
       "source": "CoinDesk",
       "source_url": "https://www.coindesk.com/markets/2026/09/01/bitcoin-enters-rektember-as-rate-hike-risks-threaten-its-august-rally",
-      "lang_original": "en"
-    },
-    {
-      "id": "2026-09-18-econ-9",
-      "date": "2026-09-18",
-      "category": "economy",
-      "headline": "SEC, 암호화폐 자산 규정(Regulation Crypto Assets) 초안 발표…ETF 심사 기간도 대폭 단축",
-      "preview": "미 증권거래위원회(SEC)가 8월 18일 암호화폐 자산 전용 규정 'Regulation Crypto Assets' 초안을 제안했으며, 코멘트 제출 마감은 2026년 10월 20일이다. 약 10년 만에 처음으로 암호화폐 전용 공모 체계를 마련하는 시도로, 연방 증권법 적용 여부 명확화와 미국 투자자 보호 강화를 목표로 제시했다. 별도로 9월에는 암호화폐 ETF(상장지수펀드) 신규 상장 심사 기간을 최대 240일에서 최대 75일로 단축하는 일반 기준이 확정됐다. 9월 1일에는 분산원장기술(DLT/블록체인)을 이용한 증권 소유권 추적을 허용하는 이전대리인 현대화 규정 초안도 제안됐다.",
-      "body": "미 증권거래위원회(SEC, Securities and Exchange Commission)는 8월 18일 암호화폐 자산(crypto assets) 전용 규정인 'Regulation Crypto Assets' 초안을 제안했다. 코멘트(의견) 제출 마감은 2026년 10월 20일이다.\n\n이번 제안은 약 10년간 비공식 가이던스와 집행(enforcement) 위주로 이루어졌던 SEC의 암호화폐 규제 방식에서 벗어나, 특정 암호화폐 관련 투자계약에 대해 1933년 증권법(Securities Act of 1933) 등록 없이도 공모할 수 있는 별도 체계를 처음으로 마련하는 것이다. SEC는 연방 증권법 적용 여부 명확화, 역외 이전 유인 감소, 미국 투자자 보호 강화를 목표로 제시했다.\n\n또한 SEC는 9월에 암호화폐 상장지수펀드(ETF, Exchange-Traded Fund)의 신규 상장 심사 기간을 기존 최대 240일에서 최대 75일로 대폭 단축하는 일반 기준을 확정했다. 9월 1일에는 분산원장기술(DLT, Distributed Ledger Technology·블록체인)을 이용해 증권 소유권을 추적할 수 있도록 허용하는 이전대리인(transfer agent) 현대화 규정 초안도 별도로 제안했다.",
-      "source": "SEC",
-      "source_url": "https://www.sec.gov/newsroom/press-releases/2026-76-sec-proposes-new-regulation-crypto-assets",
       "lang_original": "en"
     },
     {
