@@ -367,6 +367,8 @@ let _stockSub = 'daily';     // 'daily' | 'detail'
 let _detailUnit = 'month';   // 'month' | 'week'
 let _detailFrom = null, _detailTo = null;   // 기간 범위(키). null = 전체
 
+const WEEK_VISIBLE = 10;     // 주간 그래프 한 화면에 보일 주 수
+
 // 수익률 막대그래프(인라인 SVG) — 기간별 수익률(%)
 function returnBarChart(rows) {
   if (!rows.length) return `<div class="muted">기간 데이터가 아직 부족해요.</div>`;
@@ -389,7 +391,10 @@ function returnBarChart(rows) {
     bars += `<text x="${x + bw / 2}" y="${(up ? y - 6 : y + h + 14).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${color}">${pct > 0 ? '+' : ''}${pct.toFixed(2)}%</text>`;
     bars += `<text x="${x + bw / 2}" y="${H - 14}" text-anchor="middle" font-size="10.5" fill="#64748b">${escapeHtml(r.label)}</text>`;
   });
-  return `<div class="ret-chart-wrap"><svg class="ret-chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${_detailUnit === 'month' ? '월간' : '주간'} 수익률 추이">
+  // 주간: 한 화면엔 최신 10주만, 넘치면 가로 슬라이드(처음엔 최신 쪽으로 스크롤 — renderStock 에서)
+  const slide = _detailUnit === 'week' && n > WEEK_VISIBLE;
+  const slideStyle = slide ? ` style="width:${(n / WEEK_VISIBLE * 100).toFixed(2)}%"` : '';
+  return `${slide ? `<div class="ret-slide-hint">← 밀어서 이전 주 보기 (총 ${n}주)</div>` : ''}<div class="ret-chart-wrap${slide ? ' slide' : ''}"><svg class="ret-chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"${slideStyle} role="img" aria-label="${_detailUnit === 'month' ? '월간' : '주간'} 수익률 추이">
     <line x1="${padX - 8}" y1="${zeroY}" x2="${W - padX + 8}" y2="${zeroY}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3"/>
     ${bars}
   </svg></div>`;
@@ -443,6 +448,7 @@ function renderStock() {
        <button class="stock-subtab ${_stockSub === 'detail' ? 'on' : ''}" type="button" data-ssub="detail">📊 자세히 알아보기</button>
      </div>
      <div class="stock-body">${_stockSub === 'detail' ? stockDetailHTML(reports) : stockDailyHTML(reports)}</div>`;
+  const sw = box.querySelector('.ret-chart-wrap.slide'); if (sw) sw.scrollLeft = sw.scrollWidth;
   document.querySelectorAll('.stock-subtab').forEach(b => b.onclick = () => { _stockSub = b.dataset.ssub; renderStock(); });
   document.querySelectorAll('.ret-unit-btn').forEach(b => b.onclick = () => { _detailUnit = b.dataset.unit; _detailFrom = null; _detailTo = null; renderStock(); });
   const rf = document.getElementById('retFrom'); if (rf) rf.onchange = () => { _detailFrom = rf.value; renderStock(); };

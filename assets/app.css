@@ -220,6 +220,9 @@ body {
 .ret-range .rr-reset.on { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
 .ret-chart-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .ret-chart { display: block; height: auto; max-width: 100%; }
+/* 주간 10주 초과: SVG 폭을 (주수/10)배로 늘려 10주만 보이고 나머지는 가로 슬라이드 */
+.ret-chart-wrap.slide .ret-chart { max-width: none; }
+.ret-slide-hint { font-size: .7rem; color: var(--muted); font-weight: 600; margin-bottom: 4px; text-align: right; }
 .ret-wrap { display: grid; gap: 12px; margin-bottom: 14px; }
 .ret-block {
   background: var(--card); border: 1px solid var(--border);
