@@ -284,7 +284,10 @@ function bindViewTabs() {
       const stock = document.getElementById('view-stock');
       if (news) news.classList.toggle('hidden', activeView !== 'news');
       if (stock) stock.classList.toggle('hidden', activeView !== 'stock');
+      const info = document.getElementById('view-info');
+      if (info) info.classList.toggle('hidden', activeView !== 'info');
       if (activeView === 'stock' && stockReports === null) loadStock();
+      if (activeView === 'info') renderInfo();
     };
   });
 }
@@ -512,10 +515,241 @@ function stockDailyHTML(reports) {
   }).join('');
 }
 
+// ── 정보(수동 입력 글) — 기사모음과 같은 동기화 서버·비밀번호, 키만 다름 ──
+// 항목: { id, title, html, savedAt }. html 은 서식(진하게·크기·글자색·음영·정렬) 포함.
+const INFO_KEY = 'briefing-info-v1';                    // 로컬 캐시
+const INFO_API = COLLECTION_API + '/api/info';
+let infoEditId = null;   // null = 새 글, 아니면 수정 중인 글 id
+
+function infoLocal() {
+  try { const l = JSON.parse(localStorage.getItem(INFO_KEY) || '[]'); return Array.isArray(l) ? l : []; }
+  catch (e) { return []; }
+}
+async function fetchInfo() {
+  const token = collectionToken();
+  if (!token) return { needToken: true };
+  try {
+    const res = await fetch(INFO_API, { headers: { 'X-Edit-Token': token }, cache: 'no-store' });
+    if (res.status === 401) { try { localStorage.removeItem(COLLECTION_TOKEN_KEY); } catch (e) {} return { badToken: true }; }
+    if (res.ok) {
+      const j = await res.json();
+      const items = Array.isArray(j.items) ? j.items : [];
+      try { localStorage.setItem(INFO_KEY, JSON.stringify(items)); } catch (e) {}
+      return { items };
+    }
+  } catch (e) {}
+  return { items: infoLocal(), offline: true };
+}
+// 다른 기기에서 추가한 글을 덮어쓰지 않도록 저장 직전에 서버 목록을 새로 받아 고친다.
+async function mutateInfo(fn) {
+  const r = await fetchInfo();
+  if (r.needToken || r.badToken) { promptInfoToken(); return false; }
+  if (r.offline) { alert('서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.'); return false; }
+  const list = fn(r.items || []);
+  try {
+    const res = await fetch(INFO_API, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Edit-Token': collectionToken() }, body: JSON.stringify({ items: list }) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch (e) { alert('저장하지 못했어요. 잠시 후 다시 시도해 주세요.'); return false; }
+  try { localStorage.setItem(INFO_KEY, JSON.stringify(list)); } catch (e) {}
+  return true;
+}
+function promptInfoToken() {
+  const v = prompt('브리핑 동기화 비밀번호를 입력하세요 (블로그작성 앱과 동일).');
+  if (v && v.trim()) { try { localStorage.setItem(COLLECTION_TOKEN_KEY, v.trim()); } catch (e) {} renderInfo(); }
+}
+
+// 저장된 서식 HTML 에서 허용한 태그·스타일만 남긴다(붙여넣기·외부 편집 대비).
+const INFO_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'SPAN', 'FONT', 'DIV', 'P', 'BR']);
+const INFO_STYLES = ['color', 'background-color', 'font-size', 'font-weight', 'text-align'];
+function sanitizeInfo(html) {
+  const tpl = document.createElement('template');
+  tpl.innerHTML = String(html || '');
+  const walk = (parent) => {
+    [...parent.childNodes].forEach(n => {
+      if (n.nodeType === 3) return;
+      if (n.nodeType !== 1 || !INFO_TAGS.has(n.tagName)) {
+        if (n.nodeType === 1 && !/^(SCRIPT|STYLE|IFRAME|OBJECT)$/.test(n.tagName)) {
+          walk(n);
+          while (n.firstChild) parent.insertBefore(n.firstChild, n);
+        }
+        n.remove(); return;
+      }
+      const keep = INFO_STYLES.map(k => [k, n.style.getPropertyValue(k)]).filter(([, v]) => v && !/url\(|expression/i.test(v));
+      const color = n.tagName === 'FONT' ? n.getAttribute('color') : null;
+      const size = n.tagName === 'FONT' ? n.getAttribute('size') : null;
+      const align = n.getAttribute('align');
+      [...n.attributes].forEach(a => n.removeAttribute(a.name));
+      keep.forEach(([k, v]) => n.style.setProperty(k, v));
+      if (color && /^#?[\w]+$/.test(color)) n.setAttribute('color', color);
+      if (size && /^[1-7]$/.test(size)) n.setAttribute('size', size);
+      if (align && /^(left|center|right|justify)$/.test(align)) n.style.textAlign = align;
+      walk(n);
+    });
+  };
+  walk(tpl.content);
+  return tpl.innerHTML;
+}
+// 카드 미리보기용 평문(줄바꿈 유지)
+function infoPlain(html) {
+  const d = document.createElement('div');
+  d.innerHTML = String(html || '').replace(/<br\s*\/?>/gi, '\n').replace(/<(div|p)\b/gi, '\n<$1');
+  return d.textContent.replace(/ /g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+async function renderInfo() {
+  const box = document.getElementById('info');
+  if (!box) return;
+  if (!box.querySelector('.card')) box.innerHTML = `<div class="loading">불러오는 중…</div>`;
+  const r = await fetchInfo();
+  if (r.needToken || r.badToken) {
+    box.innerHTML = `<div class="empty">${r.badToken ? '비밀번호가 올바르지 않아요.<br>' : ''}정보 탭은 <b>동기화 비밀번호</b>가 필요해요.<br>
+      <button class="reset" id="infoTokenBtn" type="button" style="margin-top:12px">🔑 비밀번호 입력</button></div>`;
+    const b = document.getElementById('infoTokenBtn'); if (b) b.onclick = promptInfoToken;
+    return;
+  }
+  const items = (r.items || []).slice().sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
+  if (!items.length) {
+    box.innerHTML = `<div class="empty">아직 올린 정보가 없어요.<br>오른쪽 아래 <b>＋</b> 버튼으로 추가하세요.${r.offline ? '<br><small>(오프라인 — 캐시 표시)</small>' : ''}</div>`;
+    return;
+  }
+  let lastDate = '';
+  box.innerHTML = items.map(it => {
+    const d = String(it.savedAt || '').slice(0, 10);
+    let header = '';
+    if (d && d !== lastDate) { header = `<div class="date-header">${escapeHtml(fmtDateHeader(d))}</div>`; lastDate = d; }
+    return header + `
+    <article class="card info" data-id="${escapeAttr(it.id || '')}">
+      <button class="card-head" type="button" aria-expanded="false">
+        <span class="flag info"></span>
+        <span class="headline">${escapeHtml(it.title || '(제목 없음)')}</span>
+      </button>
+      <div class="preview">${escapeHtml(infoPlain(it.html))}</div>
+      <div class="full" hidden>
+        <div class="body info-body">${sanitizeInfo(it.html)}</div>
+        <div class="meta">
+          <button class="edit-info" type="button" data-id="${escapeAttr(it.id || '')}">✏️ 수정</button>
+          <button class="del-collection del-info" type="button" data-id="${escapeAttr(it.id || '')}">🗑 삭제</button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+  attachCardToggles(box);
+  box.querySelectorAll('.edit-info').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const it = items.find(x => x.id === b.dataset.id);
+    if (it) openInfoDialog(it);
+  });
+  box.querySelectorAll('.del-info').forEach(b => b.onclick = async (e) => {
+    e.stopPropagation();
+    if (!confirm('이 정보를 삭제할까요?')) return;
+    if (await mutateInfo(list => list.filter(x => x.id !== b.dataset.id))) renderInfo();
+  });
+}
+
+function openInfoDialog(it) {
+  if (!collectionToken()) { promptInfoToken(); if (!collectionToken()) return; }
+  infoEditId = it ? it.id : null;
+  document.getElementById('infoDlgTitle').textContent = it ? '정보 수정' : '정보 추가';
+  document.getElementById('infoTitle').value = it ? (it.title || '') : '';
+  document.getElementById('infoBody').innerHTML = it ? sanitizeInfo(it.html) : '';
+  infoSavedRange = null;
+  document.getElementById('infoDialog').showModal();
+  setTimeout(() => document.getElementById('infoTitle').focus(), 50);
+}
+async function saveInfoDialog() {
+  const title = document.getElementById('infoTitle').value.trim();
+  const ed = document.getElementById('infoBody');
+  const html = sanitizeInfo(ed.innerHTML);
+  if (!title) { alert('제목을 입력해 주세요.'); return; }
+  if (!infoPlain(html)) { alert('내용을 입력해 주세요.'); return; }
+  const btn = document.getElementById('infoSave');
+  btn.disabled = true; btn.textContent = '저장 중…';
+  const editId = infoEditId;
+  const ok = await mutateInfo(list => {
+    if (editId) return list.map(x => x.id === editId ? { ...x, title, html, updatedAt: new Date().toISOString() } : x);
+    return [...list, { id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, html, savedAt: new Date().toISOString() }];
+  });
+  btn.disabled = false; btn.textContent = '저장';
+  if (ok) { document.getElementById('infoDialog').close(); renderInfo(); }
+}
+
+// ── 서식 툴바(도서모음 앱과 같은 구성) ──
+let fmtScope = 'sel';       // 'sel' 선택영역 / 'all' 전체
+let infoSavedRange = null;  // 편집기 안의 마지막 선택(버튼 탭으로 포커스 잃어도 복원)
+function withScope(run) {
+  const ed = document.getElementById('infoBody');
+  ed.focus();
+  const s = window.getSelection();
+  if (fmtScope === 'all') {
+    const r = document.createRange(); r.selectNodeContents(ed); s.removeAllRanges(); s.addRange(r);
+  } else if (infoSavedRange && ed.contains(infoSavedRange.commonAncestorContainer)) { s.removeAllRanges(); s.addRange(infoSavedRange); }
+  try { document.execCommand('styleWithCSS', false, true); } catch (e) {}
+  run();
+}
+function fmtCmd(cmd) { withScope(() => document.execCommand(cmd)); }
+function fmtSize(sz) { withScope(() => document.execCommand('fontSize', false, sz)); }
+function fmtColor(c) { withScope(() => document.execCommand('foreColor', false, c)); }
+// 글자 음영(형광펜) — c='none' 이면 음영 지우기.
+function fmtHilite(c) {
+  withScope(() => {
+    const v = (c === 'none') ? 'transparent' : c;
+    if (!document.execCommand('hiliteColor', false, v)) document.execCommand('backColor', false, v);
+    tidyHilite(document.getElementById('infoBody'));
+  });
+}
+// 지우기로 남은 'transparent' 배경과 알맹이 없는 span 을 걷어낸다.
+function tidyHilite(ed) {
+  ed.querySelectorAll('[style*="background"]').forEach(el => {
+    const bg = el.style.backgroundColor;
+    if (bg === 'transparent' || /^rgba\(\s*0,\s*0,\s*0,\s*0\s*\)$/.test(bg)) el.style.backgroundColor = '';
+    if (!el.getAttribute('style')) el.removeAttribute('style');
+    if (el.tagName === 'SPAN' && !el.attributes.length) {
+      const p = el.parentNode;
+      while (el.firstChild) p.insertBefore(el.firstChild, el);
+      p.removeChild(el);
+    }
+  });
+  ed.normalize();
+}
+
+function bindInfo() {
+  document.getElementById('infoAddBtn').onclick = () => openInfoDialog(null);
+  document.getElementById('infoCancel').onclick = () => document.getElementById('infoDialog').close();
+  document.getElementById('infoSave').onclick = saveInfoDialog;
+  const ed = document.getElementById('infoBody');
+  // 붙여넣기는 글자만(다른 사이트 서식·이미지가 섞이지 않게) — 서식은 툴바로
+  ed.addEventListener('paste', e => {
+    e.preventDefault();
+    const t = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, t);
+  });
+  document.addEventListener('selectionchange', () => {
+    const s = window.getSelection(); if (!s.rangeCount) return;
+    const r = s.getRangeAt(0);
+    if (!s.isCollapsed && ed.contains(r.commonAncestorContainer)) infoSavedRange = r.cloneRange();
+  });
+  document.querySelectorAll('#fmtScope button').forEach(btn => btn.onclick = () => {
+    fmtScope = btn.dataset.scope;
+    document.querySelectorAll('#fmtScope button').forEach(b => b.classList.toggle('on', b === btn));
+  });
+  // 버튼은 pointerdown+preventDefault 로 편집기 선택을 뺏지 않음
+  const bindFmt = (sel, fn) => document.querySelectorAll(sel).forEach(btn =>
+    btn.addEventListener('pointerdown', e => { e.preventDefault(); fn(btn); }));
+  bindFmt('#fmtBar [data-cmd]', btn => fmtCmd(btn.dataset.cmd));
+  bindFmt('#fmtBar [data-size]', btn => fmtSize(btn.dataset.size));
+  bindFmt('#fmtColors [data-color]', btn => fmtColor(btn.dataset.color));
+  bindFmt('#fmtHilites [data-hilite]', btn => fmtHilite(btn.dataset.hilite));
+  const cp = document.getElementById('fmtColorPick');
+  cp.addEventListener('input', () => fmtColor(cp.value));
+  const hp = document.getElementById('fmtHilitePick');
+  hp.addEventListener('input', () => fmtHilite(hp.value));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   bindFilters();
   bindSubFilters();
   bindViewTabs();
+  bindInfo();
   load();
   // 다시 보일 때 최신으로 갱신 (매일 6시 업데이트 반영 + 기사모음 반영)
   document.addEventListener('visibilitychange', () => {
@@ -523,6 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
       load();
       if (activeCat === 'collection') renderCollection();
       if (activeView === 'stock') loadStock();
+      if (activeView === 'info' && !document.getElementById('infoDialog').open) renderInfo();
     }
   });
   // 블로그작성 앱이 다른 탭에서 저장하면(같은 오리진) 즉시 반영

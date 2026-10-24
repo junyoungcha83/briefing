@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>브리핑</title>
-<link rel="stylesheet" href="assets/app.css?v=8" />
+<link rel="stylesheet" href="assets/app.css?v=9" />
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest" />
@@ -27,6 +27,7 @@
 <nav class="viewtabs" id="viewtabs" role="tablist" aria-label="보기 전환">
   <button class="vtab active" data-view="news" role="tab" aria-selected="true">📰 뉴스</button>
   <button class="vtab" data-view="stock" role="tab" aria-selected="false">📈 알아보기</button>
+  <button class="vtab" data-view="info" role="tab" aria-selected="false">📝 정보</button>
 </nav>
 
 <div class="view" id="view-news">
@@ -70,7 +71,74 @@
   </main>
 </div>
 
-<script src="assets/app.js?v=8"></script>
+<div class="view hidden" id="view-info">
+  <main class="feed" id="info">
+    <div class="loading">불러오는 중…</div>
+  </main>
+  <button class="fab" id="infoAddBtn" type="button" aria-label="정보 추가">＋</button>
+</div>
+
+<!-- 정보 추가/수정 — 제목 + 서식 있는 내용 -->
+<dialog class="info-dialog" id="infoDialog">
+  <form method="dialog" class="info-form">
+    <div class="info-dlg-head">
+      <h2 id="infoDlgTitle">정보 추가</h2>
+      <button class="info-x" id="infoCancel" type="button" aria-label="닫기">✕</button>
+    </div>
+    <input class="info-title" id="infoTitle" type="text" autocomplete="off" placeholder="제목" />
+    <div class="fmt-bar" id="fmtBar">
+      <div class="fmt-scope" id="fmtScope">
+        <span class="fmt-label">적용:</span>
+        <button type="button" data-scope="sel" class="on">선택</button>
+        <button type="button" data-scope="all">전체</button>
+      </div>
+      <div class="fmt-row">
+        <div class="fmt-group" title="글자">
+          <button type="button" data-cmd="bold" aria-label="진하게"><b>진하게</b></button>
+        </div>
+        <div class="fmt-group" title="정렬">
+          <button type="button" data-cmd="justifyLeft" aria-label="왼쪽 정렬">좌</button>
+          <button type="button" data-cmd="justifyCenter" aria-label="가운데 정렬">중</button>
+          <button type="button" data-cmd="justifyRight" aria-label="오른쪽 정렬">우</button>
+        </div>
+        <div class="fmt-group" title="글자 크기">
+          <button type="button" data-size="2">작게</button>
+          <button type="button" data-size="4">보통</button>
+          <button type="button" data-size="6">크게</button>
+          <button type="button" data-size="7">특대</button>
+        </div>
+        <div class="fmt-group colors" id="fmtColors" title="글자 색">
+          <span class="grp-label">글자색</span>
+          <button type="button" class="sw" data-color="#0f172a" style="background:#0f172a"></button>
+          <button type="button" class="sw" data-color="#ef4444" style="background:#ef4444"></button>
+          <button type="button" class="sw" data-color="#f97316" style="background:#f97316"></button>
+          <button type="button" class="sw" data-color="#16a34a" style="background:#16a34a"></button>
+          <button type="button" class="sw" data-color="#2563eb" style="background:#2563eb"></button>
+          <button type="button" class="sw" data-color="#7c3aed" style="background:#7c3aed"></button>
+          <label class="sw custom" title="직접 선택"><input type="color" id="fmtColorPick" value="#14b8a6" /></label>
+        </div>
+        <!-- 글자 음영(형광펜): 고른 글자의 배경색 -->
+        <div class="fmt-group colors" id="fmtHilites" title="글자 음영">
+          <span class="grp-label">음영</span>
+          <button type="button" class="sw" data-hilite="#fef08a" style="background:#fef08a"></button>
+          <button type="button" class="sw" data-hilite="#bbf7d0" style="background:#bbf7d0"></button>
+          <button type="button" class="sw" data-hilite="#bfdbfe" style="background:#bfdbfe"></button>
+          <button type="button" class="sw" data-hilite="#fbcfe8" style="background:#fbcfe8"></button>
+          <button type="button" class="sw" data-hilite="#fed7aa" style="background:#fed7aa"></button>
+          <button type="button" class="sw" data-hilite="#e2e8f0" style="background:#e2e8f0"></button>
+          <label class="sw custom" title="직접 선택"><input type="color" id="fmtHilitePick" value="#fde68a" /></label>
+          <button type="button" class="sw none" data-hilite="none" title="음영 지우기" aria-label="음영 지우기"></button>
+        </div>
+      </div>
+    </div>
+    <div class="info-edit" id="infoBody" contenteditable="true" data-ph="내용을 입력하세요…"></div>
+    <div class="info-dlg-foot">
+      <button class="info-save" id="infoSave" type="button">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="assets/app.js?v=9"></script>
 <script>
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

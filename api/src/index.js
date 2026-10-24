@@ -1,9 +1,10 @@
 // 브리핑 기사모음 — 동기화 API (개인용, 토큰 보호)
 // - GET /api/collection : X-Edit-Token 일치 시 전체 목록 반환
 // - PUT /api/collection : X-Edit-Token 일치 시 전체 목록 저장
-// KV: COLLECTION (단일 키 "briefing-collection")  ·  Secret: EDIT_TOKEN
+// - GET/PUT /api/info   : 정보 탭(수동 입력 글) — 같은 방식, 다른 키
+// KV: COLLECTION (키 "briefing-collection" · "briefing-info")  ·  Secret: EDIT_TOKEN
 
-const KEY = 'briefing-collection';
+const KEYS = { '/api/collection': 'briefing-collection', '/api/info': 'briefing-info' };
 const MAX_BYTES = 4 * 1024 * 1024;
 
 const ALLOWED_ORIGINS = [
@@ -35,7 +36,8 @@ export default {
     const cors = corsHeaders(req);
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
 
-    if (url.pathname === '/api/collection') {
+    const KEY = KEYS[url.pathname];
+    if (KEY) {
       const token = req.headers.get('X-Edit-Token') || '';
       if (!env.EDIT_TOKEN || token !== env.EDIT_TOKEN) return json({ error: 'unauthorized' }, 401, cors);
 

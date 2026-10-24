@@ -86,6 +86,7 @@ body {
 .flag.realestate::after { background: var(--re); }
 .flag.economy::after    { background: var(--ec); }
 .flag.collection::after { background: #10b981; }
+.flag.info::after       { background: #f59e0b; }
 .del-collection {
   margin-left: auto; border: 1px solid var(--border); background: #fff; color: #b91c1c;
   border-radius: 999px; padding: 5px 12px; font-size: .82rem; cursor: pointer;
@@ -115,6 +116,7 @@ body {
 }
 .card.realestate { border-left-color: var(--re); }
 .card.economy    { border-left-color: var(--ec); }
+.card.info       { border-left-color: #f59e0b; }
 
 .card-head {
   display: flex; align-items: flex-start; gap: 8px;
@@ -290,3 +292,74 @@ body {
   white-space: pre-wrap; word-break: break-word;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
+
+/* ── 정보 탭 (수동 입력) ── */
+.card.info .preview { white-space: pre-line; }
+.info-body div, .info-body p { margin: 0; }
+.edit-info {
+  border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 999px; padding: 5px 12px; font-size: .82rem; cursor: pointer;
+}
+.edit-info:active { background: var(--border); }
+.edit-info + .del-collection { margin-left: 0; }
+.fab {
+  position: fixed; right: 18px; bottom: calc(22px + var(--safe-bottom)); z-index: 20;
+  width: 56px; height: 56px; border-radius: 50%; border: none;
+  background: var(--header); color: #fff; font-size: 1.9rem; line-height: 1;
+  box-shadow: 0 6px 16px rgba(15,23,42,.28); cursor: pointer;
+}
+.fab:active { transform: scale(.95); }
+#info { padding-bottom: calc(96px + var(--safe-bottom)); }
+
+.info-dialog {
+  width: min(720px, 100vw); max-width: 100vw; max-height: 100dvh;
+  margin: auto; padding: 0; border: none; border-radius: 14px;
+  background: var(--card); color: var(--text);
+}
+.info-dialog::backdrop { background: rgba(15,23,42,.5); }
+@media (max-width: 600px) {
+  .info-dialog { width: 100vw; height: 100dvh; border-radius: 0; }
+}
+.info-form { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px calc(14px + var(--safe-bottom)); height: 100%; }
+.info-dlg-head { display: flex; align-items: center; }
+.info-dlg-head h2 { margin: 0; font-size: 1.05rem; }
+.info-x { margin-left: auto; border: none; background: none; font-size: 1.2rem; color: var(--muted); cursor: pointer; padding: 4px 8px; }
+.info-title {
+  width: 100%; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; font-size: 1rem; font-weight: 700; font-family: inherit;
+}
+.info-edit {
+  flex: 1; min-height: 200px; overflow-y: auto;
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  font-size: .95rem; line-height: 1.65; outline: none; word-break: break-word;
+}
+.info-edit:focus, .info-title:focus { border-color: #94a3b8; outline: none; }
+.info-edit:empty::before { content: attr(data-ph); color: #9ca3af; }
+.info-dlg-foot { display: flex; justify-content: flex-end; }
+.info-save {
+  border: none; border-radius: 10px; background: var(--header); color: #fff;
+  padding: 10px 26px; font-size: .95rem; font-weight: 700; cursor: pointer;
+}
+.info-save:disabled { opacity: .6; }
+
+/* 서식 툴바 (도서모음 앱과 같은 구성) */
+.fmt-bar { display: flex; flex-direction: column; gap: 6px; }
+.fmt-scope { display: flex; align-items: center; gap: 6px; }
+.fmt-label { font-size: .76rem; color: var(--muted); font-weight: 700; }
+.fmt-scope button { border: 1px solid var(--border); background: #f8fafc; color: var(--muted);
+  border-radius: 8px; padding: 4px 12px; font-size: .82rem; font-weight: 800; cursor: pointer; }
+.fmt-scope button.on { background: var(--header); color: #fff; border-color: var(--header); }
+.fmt-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fmt-group { display: flex; gap: 4px; padding: 3px; background: #f1f5f9; border-radius: 10px; }
+.fmt-group button { border: 1px solid var(--border); background: #fff; color: var(--text);
+  border-radius: 7px; padding: 7px 10px; font-size: .85rem; font-weight: 700; cursor: pointer; }
+.fmt-group button:active { background: #e2e8f0; }
+.fmt-group.colors { gap: 6px; align-items: center; }
+.fmt-group.colors .sw { width: 26px; height: 26px; padding: 0; border-radius: 50%; border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--border); cursor: pointer; }
+.fmt-group.colors .sw.custom { display: inline-flex; overflow: hidden; position: relative; background: conic-gradient(red,orange,yellow,lime,cyan,blue,magenta,red); }
+.fmt-group.colors .sw.custom input { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); opacity: 0; cursor: pointer; }
+.fmt-group .grp-label { align-self: center; padding: 0 2px 0 4px; font-size: .72rem; font-weight: 800; color: var(--muted); }
+/* 음영 지우기 스위치 — 흰 바탕에 빨간 사선 */
+.fmt-group.colors .sw.none { background: #fff;
+  background-image: linear-gradient(45deg, transparent 44%, #ef4444 44%, #ef4444 56%, transparent 56%); }
