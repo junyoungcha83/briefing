@@ -559,8 +559,11 @@ function promptInfoToken() {
 }
 
 // 저장된 서식 HTML 에서 허용한 태그·스타일만 남긴다(붙여넣기·외부 편집 대비).
-const INFO_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'SPAN', 'FONT', 'DIV', 'P', 'BR']);
-const INFO_STYLES = ['color', 'background-color', 'font-size', 'font-weight', 'text-align'];
+// 표·목록·소제목과 막대그래프(폭·높이를 준 DIV)까지 허용 — 분석 정리글용.
+const INFO_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'SPAN', 'FONT', 'DIV', 'P', 'BR',
+  'H3', 'H4', 'UL', 'OL', 'LI', 'TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD', 'SMALL', 'HR']);
+const INFO_STYLES = ['color', 'background-color', 'font-size', 'font-weight', 'text-align',
+  'width', 'height', 'padding', 'margin-top', 'margin-bottom', 'border-radius', 'display', 'white-space', 'line-height'];
 function sanitizeInfo(html) {
   const tpl = document.createElement('template');
   tpl.innerHTML = String(html || '');

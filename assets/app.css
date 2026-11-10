@@ -296,6 +296,17 @@ body {
 /* ── 정보 탭 (수동 입력) ── */
 .card.info .preview { white-space: pre-line; }
 .info-body div, .info-body p { margin: 0; }
+.info-body { overflow-x: auto; }
+.info-body h3 { font-size: 1.02rem; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #f59e0b; }
+.info-body h4 { font-size: .93rem; margin: 12px 0 6px; }
+.info-body ul, .info-body ol { margin: 6px 0; padding-left: 20px; }
+.info-body li { margin: 3px 0; }
+.info-body hr { border: 0; border-top: 1px dashed var(--border); margin: 14px 0; }
+.info-body table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: .86rem; }
+.info-body th, .info-body td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+.info-body th { background: #f8fafc; white-space: nowrap; }
+.info-body td { word-break: keep-all; }
+.info-body td:first-child { white-space: nowrap; }
 .edit-info {
   border: 1px solid var(--border); background: #fff; color: var(--text);
   border-radius: 999px; padding: 5px 12px; font-size: .82rem; cursor: pointer;
